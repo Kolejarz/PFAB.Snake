@@ -8,6 +8,8 @@ internal class Game
     private readonly int _height;
     private readonly int[,] _board;
     private readonly Snake _snake;
+    private readonly Random _random = new();
+    private IList<(int x, int y)> _apples = new List<(int x, int y)>();
 
     public Game(int width, int height)
     {
@@ -15,6 +17,7 @@ internal class Game
         _height = height;
         _board = new int[width, height];
         _snake = new Snake((width / 2, height / 2), Direction.Right);
+        _apples.Add((_random.Next(_width), _random.Next(_height)));
     }
 
     public void Render()
@@ -29,6 +32,11 @@ internal class Game
             {
                 canvas.SetPixel(x, y, _board[x, y] == 0 ? Color.Grey15 : Color.Aqua);
             }
+        }
+
+        foreach (var (x, y) in _apples)
+        {
+            canvas.SetPixel(x, y, Color.Red);
         }
 
         foreach (var (x, y) in _snake.Body)
@@ -72,6 +80,19 @@ internal class Game
         }
 
         // snake collided with itself
-        return !_snake.Body.Contains(_snake.Head);
+        if (_snake.Body.Contains(_snake.Head))
+        {
+            return false;
+        }
+
+        var appleGained = _apples.IndexOf(_snake.Head);
+        if (appleGained >= 0)
+        {
+            _snake.AddSegment(_apples[appleGained]);
+            _apples.RemoveAt(appleGained);
+            _apples.Add((_random.Next(_width), _random.Next(_height)));
+        }
+
+        return true;
     }
 }

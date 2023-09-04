@@ -24,9 +24,14 @@ internal class Snake
         Direction = direction;
     }
 
+    public void AddSegment((int x, int y) position)
+    {
+        _body.Enqueue(position);
+    }
+
     private void TakeStep((int x, int y) nextMove)
     {
-        if(_body.Count > 16)
+        if(_body.Count > 4)
         {
             _ = _body.Dequeue();
         }
