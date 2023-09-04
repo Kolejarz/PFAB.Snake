@@ -1,0 +1,10 @@
+- [ ] game running in terminal
+- [ ] apples value decreasing over time
+- [ ] FPS limit
+- [ ] non-blocking user input
+- [ ] highscores
+- [ ] powerups
+- [ ] animations
+- [ ] unit tests
+- [ ] PvP with AI
+- [ ] title screen
