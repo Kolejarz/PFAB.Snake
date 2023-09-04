@@ -2,4 +2,8 @@
 
 Console.WriteLine("Hello Snake!");
 var game = new Game(16, 16);
-game.Render();
+
+do
+{
+    game.Render();
+} while(game.ReadInput());

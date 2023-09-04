@@ -19,6 +19,7 @@ internal class Game
 
     public void Render()
     {
+        AnsiConsole.Cursor.SetPosition(0, 0);
         var canvas = new Canvas(_width, _height);
         var panel = new Panel(canvas);
 
@@ -30,21 +31,30 @@ internal class Game
             }
         }
 
-        canvas.SetPixel(_snake.Head.x, _snake.Head.y, Color.Green);
+        canvas.SetPixel(_snake.Head.x, _snake.Head.y, Color.LightGreen);
         foreach (var (x, y) in _snake.Body)
         {
-            canvas.SetPixel(x, y, Color.Red);
+            canvas.SetPixel(x, y, Color.Green);
         }
 
         AnsiConsole.Write(panel);
     }
 
-    private (int x, int y) SnakeMoveVector => _snake.Direction switch
+    public bool ReadInput()
     {
-        Direction.Up => (0, -1),
-        Direction.Down => (0, 1),
-        Direction.Left => (-1, 0),
-        Direction.Right => (1, 0),
-        _ => throw new ArgumentOutOfRangeException()
-    };
+        var key = Console.ReadKey().Key;
+
+        if (key == ConsoleKey.Escape) return false;
+
+        _snake.Direction = key switch
+        {
+            ConsoleKey.UpArrow => Direction.Up,
+            ConsoleKey.DownArrow => Direction.Down,
+            ConsoleKey.LeftArrow => Direction.Left,
+            ConsoleKey.RightArrow => Direction.Right,
+            _ => _snake.Direction
+        };
+
+        return true;
+    }
 }
