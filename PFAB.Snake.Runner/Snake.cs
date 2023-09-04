@@ -26,7 +26,7 @@ internal class Snake
 
     private void TakeStep((int x, int y) nextMove)
     {
-        if(_body.Count > 3)
+        if(_body.Count > 16)
         {
             _ = _body.Dequeue();
         }

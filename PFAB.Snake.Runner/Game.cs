@@ -31,11 +31,11 @@ internal class Game
             }
         }
 
-        canvas.SetPixel(_snake.Head.x, _snake.Head.y, Color.LightGreen);
         foreach (var (x, y) in _snake.Body)
         {
             canvas.SetPixel(x, y, Color.Green);
         }
+        canvas.SetPixel(_snake.Head.x, _snake.Head.y, Color.LightGreen);
 
         AnsiConsole.Write(panel);
     }
@@ -43,10 +43,10 @@ internal class Game
     public bool ReadInput()
     {
         var key = Console.ReadKey().Key;
-
+        // user closed game
         if (key == ConsoleKey.Escape) return false;
 
-        _snake.Direction = key switch
+        var direction = key switch
         {
             ConsoleKey.UpArrow => Direction.Up,
             ConsoleKey.DownArrow => Direction.Down,
@@ -55,6 +55,23 @@ internal class Game
             _ => _snake.Direction
         };
 
-        return true;
+        if (direction == Direction.Right && _snake.Direction == Direction.Left ||
+            direction == Direction.Left && _snake.Direction == Direction.Right ||
+            direction == Direction.Down && _snake.Direction == Direction.Up ||
+            direction == Direction.Up && _snake.Direction == Direction.Down)
+        {
+            direction = _snake.Direction;
+        }
+
+        _snake.Direction = direction;
+
+        // snake left board
+        if (_snake.Head.x < 0 || _snake.Head.y < 0 || _snake.Head.x >= _width || _snake.Head.y >= _height)
+        {
+            return false;
+        }
+
+        // snake collided with itself
+        return !_snake.Body.Contains(_snake.Head);
     }
 }
