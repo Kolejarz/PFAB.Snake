@@ -1,9 +1,10 @@
 ﻿using PFAB.Snake.Runner;
 
-Console.WriteLine("Hello Snake!");
-var game = new Game(32, 24);
+var game = new Game(8, 8);
 
 do
 {
     game.Render();
 } while(game.ReadInput());
+
+Console.WriteLine($"GAME FINISHED! Your score: {game.Score}");

@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Security.Cryptography.X509Certificates;
+using Spectre.Console;
 
 namespace PFAB.Snake.Runner;
 
@@ -8,8 +9,9 @@ internal class Game
     private readonly int _height;
     private readonly int[,] _board;
     private readonly Snake _snake;
-    private readonly Random _random = new();
-    private IList<(int x, int y)> _apples = new List<(int x, int y)>();
+    private readonly IList<(int x, int y)> _apples = new List<(int x, int y)>();
+
+    public int Score { get; private set; }
 
     public Game(int width, int height)
     {
@@ -17,7 +19,7 @@ internal class Game
         _height = height;
         _board = new int[width, height];
         _snake = new Snake((width / 2, height / 2), Direction.Right);
-        _apples.Add((_random.Next(_width), _random.Next(_height)));
+        _apples.Add(RandomEmptySpot());
     }
 
     public void Render()
@@ -45,6 +47,7 @@ internal class Game
         }
         canvas.SetPixel(_snake.Head.x, _snake.Head.y, Color.LightGreen);
 
+        AnsiConsole.WriteLine($"SCORE: {Score}");
         AnsiConsole.Write(panel);
     }
 
@@ -88,11 +91,30 @@ internal class Game
         var appleGained = _apples.IndexOf(_snake.Head);
         if (appleGained >= 0)
         {
+            Score++;
             _snake.AddSegment(_apples[appleGained]);
             _apples.RemoveAt(appleGained);
-            _apples.Add((_random.Next(_width), _random.Next(_height)));
+            _apples.Add(RandomEmptySpot());
         }
 
         return true;
+    }
+
+    private (int x, int y) RandomEmptySpot()
+    {
+        var availableSpots = new List<(int x, int y)>();
+
+        for (var x = 0; x < _width; x++)
+        {
+            for (var y = 0; y < _height; y++)
+            {
+                if (_board[x, y] != 0) continue;
+                if (_apples.Contains((x, y))) continue;
+                if(_snake.Occupies((x, y))) continue;
+                availableSpots.Add((x, y));
+            }
+        }
+
+        return availableSpots.OrderBy(_ => Guid.NewGuid()).FirstOrDefault();
     }
 }

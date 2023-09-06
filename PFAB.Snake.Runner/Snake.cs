@@ -29,6 +29,11 @@ internal class Snake
         _body.Enqueue(position);
     }
 
+    public bool Occupies((int x, int y) spotToCheck)
+    {
+        return _body.Contains(spotToCheck);
+    }
+
     private void TakeStep((int x, int y) nextMove)
     {
         if(_body.Count > 4)
