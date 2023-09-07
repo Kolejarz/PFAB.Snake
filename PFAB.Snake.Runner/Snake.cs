@@ -1,8 +1,10 @@
-﻿namespace PFAB.Snake.Runner;
+﻿using PFAB.Snake.Runner.Primitives;
+
+namespace PFAB.Snake.Runner;
 
 internal class Snake
 {
-    private readonly Queue<(int x, int y)> _body = new ();
+    private readonly Queue<Coordinate> _body = new ();
     private Direction _direction;
 
     public Direction Direction
@@ -11,30 +13,30 @@ internal class Snake
         set
         {
             _direction = value;
-            TakeStep((Head.x + SnakeMoveVector.x, Head.y + SnakeMoveVector.y));
+            TakeStep(new Coordinate(Head.X + SnakeMoveVector.x, Head.Y + SnakeMoveVector.y));
         }
     }
 
-    public (int x, int y) Head => _body.Last();
-    public IEnumerable<(int x, int y)> Body => _body.ToArray().Reverse().Skip(1);
+    public Coordinate Head => _body.Last();
+    public IEnumerable<Coordinate> Body => _body.ToArray().Reverse().Skip(1);
 
-    public Snake((int x, int y) startingPosition, Direction direction)
+    public Snake(Coordinate startingPosition, Direction direction)
     {
         _body.Enqueue(startingPosition);
         Direction = direction;
     }
 
-    public void AddSegment((int x, int y) position)
+    public void AddSegment(Coordinate position)
     {
         _body.Enqueue(position);
     }
 
-    public bool Occupies((int x, int y) spotToCheck)
+    public bool Occupies(Coordinate spotToCheck)
     {
         return _body.Contains(spotToCheck);
     }
 
-    private void TakeStep((int x, int y) nextMove)
+    private void TakeStep(Coordinate nextMove)
     {
         if(_body.Count > 4)
         {

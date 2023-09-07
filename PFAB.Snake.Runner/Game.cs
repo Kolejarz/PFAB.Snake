@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using PFAB.Snake.Runner.Primitives;
+using Spectre.Console;
 
 namespace PFAB.Snake.Runner;
 
@@ -18,7 +19,7 @@ internal class Game
         _width = width;
         _height = height;
         _board = new int[width, height];
-        _snake = new Snake((width / 2, height / 2), Direction.Right);
+        _snake = new Snake(new Coordinate(width / 2, height / 2), Direction.Right);
         _userDirection = _snake.Direction;
         _apples.Add(RandomEmptySpot());
     }
@@ -58,7 +59,7 @@ internal class Game
         {
             canvas.SetPixel(x, y, Color.Green);
         }
-        canvas.SetPixel(_snake.Head.x, _snake.Head.y, Color.LightGreen);
+        canvas.SetPixel(_snake.Head.X, _snake.Head.Y, Color.LightGreen);
 
         AnsiConsole.WriteLine($"SCORE: {Score}");
         AnsiConsole.Write(panel);
@@ -69,7 +70,7 @@ internal class Game
         _snake.Direction = _userDirection;
 
         // snake left board
-        if (_snake.Head.x < 0 || _snake.Head.y < 0 || _snake.Head.x >= _width || _snake.Head.y >= _height)
+        if (_snake.Head.X < 0 || _snake.Head.Y < 0 || _snake.Head.X >= _width || _snake.Head.Y >= _height)
         {
             return false;
         }
@@ -80,11 +81,12 @@ internal class Game
             return false;
         }
 
-        var appleGained = _apples.IndexOf(_snake.Head);
+        var appleGained = _apples.IndexOf((_snake.Head.X, _snake.Head.Y));
         if (appleGained >= 0)
         {
             Score++;
-            _snake.AddSegment(_apples[appleGained]);
+            var (x, y) = _apples[appleGained];
+            _snake.AddSegment(new Coordinate(x, y));
             _apples.RemoveAt(appleGained);
             _apples.Add(RandomEmptySpot());
         }
@@ -133,7 +135,7 @@ internal class Game
             {
                 if (_board[x, y] != 0) continue;
                 if (_apples.Contains((x, y))) continue;
-                if(_snake.Occupies((x, y))) continue;
+                if(_snake.Occupies(new Coordinate(x, y))) continue;
                 availableSpots.Add((x, y));
             }
         }
