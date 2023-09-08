@@ -1,5 +1,6 @@
 ﻿using PFAB.Snake.Runner.Primitives;
 using Spectre.Console;
+using System.Diagnostics;
 
 namespace PFAB.Snake.Runner;
 
@@ -26,15 +27,45 @@ internal class Game
 
     public async Task Run()
     {
-        _ = Task.Run(ListenForInput);
+        var userInputListener = Task.Run(ListenForInput);
 
+        int FPS = 20;
+        int UPS = 8;  // Updates Per Second
+
+        int MS_PER_FRAME = 1000 / FPS;
+        double MS_PER_UPDATE = 1000.0 / UPS;
+
+        Stopwatch stopwatch = new Stopwatch();
+        double previousTime = stopwatch.ElapsedMilliseconds;
+        double lag = 0.0;
+
+        stopwatch.Start();
         while (true)
         {
-            if (!Update()) break;
+            double currentTime = stopwatch.ElapsedMilliseconds;
+            double elapsed = currentTime - previousTime;
+            previousTime = currentTime;
+            lag += elapsed;
+
+            while (lag >= MS_PER_UPDATE)
+            {
+                if (!Update())
+                {
+                    return;
+                }
+                lag -= MS_PER_UPDATE;
+            }
+
             Render();
-            await (Task.Delay(200));
+
+            var frameTime = stopwatch.ElapsedMilliseconds - currentTime;
+            if (frameTime < MS_PER_FRAME)
+            {
+                await Task.Delay((int)(MS_PER_FRAME - frameTime));
+            }
         }
     }
+
 
     private void Render()
     {
@@ -120,7 +151,7 @@ internal class Game
                 }
 
                 _userDirection = direction;
-                Thread.Sleep(10);
+                Thread.Sleep(5);
             }
         }
     }
@@ -135,7 +166,7 @@ internal class Game
             {
                 if (_board[x, y] != 0) continue;
                 if (_apples.Contains((x, y))) continue;
-                if(_snake.Occupies(new Coordinate(x, y))) continue;
+                if (_snake.Occupies(new Coordinate(x, y))) continue;
                 availableSpots.Add((x, y));
             }
         }
